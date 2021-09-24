@@ -2,7 +2,7 @@
 <persistence version="2.2"
              xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd">
-    <persistence-unit name="hello2">
+    <persistence-unit name="hello">
         <properties>
             <!-- 필수 속성 -->
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
@@ -17,7 +17,7 @@
             <!-- 콘솔에 표시되는 SQL을 보기 좋게 포매팅 -->
             <property name="hibernate.format_sql" value="true"/>
             <!-- SQL에 부가적인 설명을 추가(디버깅용) -->
-            <property name="hibernate.use_sql_comments" value="create"/>
+            <property name="hibernate.use_sql_comments" value="true"/>
             <!-- 사이즈만큼 모아서 DB에 한번에 넣음 -->
             <property name="hibernate.jdbc.batch_size" value="10"/>
             <!-- 애플리케이션이 실행될 때 모든 테이블을 재생성 -->
