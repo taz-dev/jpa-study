@@ -4,6 +4,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import java.util.List;
 
 public class JpaMain {
 
@@ -14,21 +15,25 @@ public class JpaMain {
         tx.begin();
 
         try{
-            Team team = new Team();
-            team.setName("teamA");
-            em.persist(team);
+            Member member1 = new Member();
+            member1.setUsername("관리자1");
+            em.persist(member1);
 
-            Member member = new Member();
-            member.setUsername("teamA");
-            member.setAge(10);
-            member.setType(MemberType.ADMIN);
-
-            member.setTeam(team);
-
-            em.persist(member);
+            Member member2 = new Member();
+            member2.setUsername("관리자2");
+            em.persist(member2);
 
             em.flush();
             em.clear();
+
+            String query = "select size(t.members) From Team t";
+
+            List<Integer> result = em.createQuery(query, Integer.class)
+                            .getResultList();
+
+            for(Integer s : result){
+                System.out.println("s = " + s);
+            }
 
             tx.commit();
         } catch (Exception e){
@@ -88,4 +93,10 @@ public class JpaMain {
 //                "     else '일반요금' end " +
 //        "from Member m";
 //List<String> result = em.createQuery(query, String.class).getResultList();
+
+//경로 표현식
+//상태 필드(state field) : 단순히 값을 저장하기 위한 필드 --> 경로 탐색의 끝, 탐색X
+//연관 필드(association field) : 단일 값 연관 필드, 컬렉션 값 연관 필드
+// --- 단일 값 연관 필드 : @ManyToOne, @OneToOne, 대상이 엔티티 --> 묵시적 내부 조인(inner join) 발생, 탐색O
+// --- 컬렉션 값 연관 필드 : @OneToMany, @ManyToMany, 대상이 컬렉션 --> 묵시적 내부 조인(inner join) 발생, 탐색X
 
