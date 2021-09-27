@@ -15,27 +15,60 @@ public class JpaMain {
         tx.begin();
 
         try{
+
+            Team teamA = new Team();
+            teamA.setName("팀A");
+            em.persist(teamA);
+
+            Team teamB = new Team();
+            teamB.setName("팀B");
+            em.persist(teamB);
+
             Member member1 = new Member();
-            member1.setUsername("관리자1");
+            member1.setUsername("회원1");
+            member1.setTeam(teamA);
             em.persist(member1);
 
             Member member2 = new Member();
-            member2.setUsername("관리자2");
+            member2.setUsername("회원2");
+            member2.setTeam(teamA);
             em.persist(member2);
+
+            Member member3 = new Member();
+            member3.setUsername("회원3");
+            member3.setTeam(teamB);
+            em.persist(member3);
 
             em.flush();
             em.clear();
 
-            String query = "select size(t.members) From Team t";
+            //회원1, 팀A(SQL)
+            //회원2, 팀A(1차캐시)
+            //회원3, 팀B(SQL)
 
-            List<Integer> result = em.createQuery(query, Integer.class)
+            //엔티티 페치 조인(다대일 관계) --> 페치 조인으로 회원과 팀을 함께 조회해서 지연 로딩X
+            //String query = "select m from Member m join fetch m.team";
+
+            //컬렉션 페치 조인(일대다 관계) --> 데이터가 늘어남 -->  distinct를 사용하자!
+            String query = "select distinct t from Team t join fetch t.members";
+
+            //페치 조인과 일반 조인의 차이
+            //1. JPQL은 결과를 반환할 때 연관관계 고려X -> 단지 SELECT절에 지정한 엔티티만 조회
+            //2. 일반 조인 실행 시 연관된 엔티티를 함께 조회하지 않음 -> Team엔티티만 조회하고, Member엔티티는 조회X
+            //3. 페치 조인을 사용할 때만 연관된 엔티티도 함께 조회(즉시 로딩)
+            //4. 페치 조인은 객체 그래프를 SQL 한번에 조회하는 개념!!
+
+            List<Team> result = em.createQuery(query, Team.class)
                             .getResultList();
 
-            for(Integer s : result){
-                System.out.println("s = " + s);
+            for(Team team : result){
+                System.out.println("team : " + team.getName() +  "/member.size : " + team.getMembers().size());
+                for (Member member : team.getMembers()) {
+                    System.out.println("--> member = " + member);
+                }
             }
 
-            tx.commit();
+           tx.commit();
         } catch (Exception e){
             tx.rollback();
 
